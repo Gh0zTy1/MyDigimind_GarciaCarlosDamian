@@ -15,10 +15,13 @@ import garcia.carlosdamian.mydigimind_garciacarlosdamian.Recordatorio
 
 class HomeFragment : Fragment() {
 
-    private lateinit var gridView: GridView
-    private lateinit var adapter: GridViewAdapter
-    private val listaRecordatorios = mutableListOf<Recordatorio>()
-    private var inicializada = false
+    private var adapter: GridViewAdapter? = null
+
+    companion object{
+        val listaRecordatorios = ArrayList<Recordatorio>()
+        var first = true
+    }
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -26,19 +29,11 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val root = inflater.inflate(R.layout.fragment_home, container, false)
-        gridView = root.findViewById(R.id.gridViewRecordatorios)
+        val gridView: GridView = root.findViewById(R.id.gridViewRecordatorios)
 
-        if (!inicializada) {
-            listaRecordatorios.add(Recordatorio("Practice", "Everyday", "17:00"))
-            listaRecordatorios.add(Recordatorio("Practice", "Everyday", "17:00"))
-            listaRecordatorios.add(Recordatorio("Practice", "Everyday", "17:00"))
-            listaRecordatorios.add(Recordatorio("Practice", "Everyday", "17:00"))
-            listaRecordatorios.add(Recordatorio("Practice", "Everyday", "17:00"))
-            listaRecordatorios.add(Recordatorio("Practice", "Everyday", "17:00"))
-            listaRecordatorios.add(Recordatorio("Practice", "Everyday", "17:00"))
-            listaRecordatorios.add(Recordatorio("Practice", "Everyday", "17:00"))
-            listaRecordatorios.add(Recordatorio("Practice", "Everyday", "17:00"))
-            inicializada = true
+        if (first){
+            filltareas()
+            first = false
         }
 
         adapter = GridViewAdapter(requireContext(), listaRecordatorios)
@@ -47,33 +42,48 @@ class HomeFragment : Fragment() {
         return root
     }
 
+    fun filltareas(){
+        listaRecordatorios.add(Recordatorio("Practice 1", arrayListOf("Tus").toString(), "17:30"))
+        listaRecordatorios.add(Recordatorio("Practice 2", arrayListOf("Mon", "Sun").toString(), "17:40"))
+        listaRecordatorios.add(Recordatorio("Practice 3", arrayListOf("Wed").toString(), "14:00"))
+        listaRecordatorios.add(Recordatorio("Practice 4", arrayListOf("Sat").toString(), "11:00"))
+        listaRecordatorios.add(Recordatorio("Practice 5", arrayListOf("Fri").toString(), "13:00"))
+    }
 
-    private class GridViewAdapter(private val context: Context, private val listaRecordatorios: List<Recordatorio>) : BaseAdapter() {
+    private class GridViewAdapter() : BaseAdapter() {
+        var listaTareas = ArrayList<Recordatorio>()
+        var context: Context? = null
 
-        override fun getCount(): Int{
-            return listaRecordatorios.size
+        constructor(contexto: Context, tareas: ArrayList<Recordatorio>) : this() {
+            this.context = contexto
+            this.listaTareas = tareas
         }
 
-        override fun getItem(position: Int): Any {
-            return listaRecordatorios[position]
+
+        override fun getCount(): Int {
+            return listaTareas.size
         }
 
-        override fun getItemId(position: Int): Long {
-            return position.toLong()
+        override fun getItem(p0: Int): Any {
+            return listaTareas[p0]
         }
 
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val recordatorio = listaRecordatorios[position]
-            val inflater = LayoutInflater.from(context)
-            val vista = convertView ?: inflater.inflate(R.layout.recordatorio, parent, false)
+        override fun getItemId(p0: Int): Long {
+            return p0.toLong()
+        }
 
-            val txtNombre: TextView = vista.findViewById(R.id.txtNombreRecordatorio)
-            val txtDias: TextView = vista.findViewById(R.id.txtDiasRecordatorio)
-            val txtTiempo: TextView = vista.findViewById(R.id.txtTiempoRecordatorio)
+        override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
+            var tarea = listaTareas[p0]
+            var inflador = LayoutInflater.from(this.context)
+            var vista = inflador.inflate(R.layout.recordatorio, null)
 
-            txtNombre.text = recordatorio.nombre
-            txtDias.text = recordatorio.dias
-            txtTiempo.text = recordatorio.tiempo
+            val nombre: TextView = vista.findViewById(R.id.tvNombreRecordatorio)
+            val tiempo: TextView = vista.findViewById(R.id.tvTiempoRecordatorio)
+            val dias: TextView = vista.findViewById(R.id.tvDiasRecordatorio)
+
+            nombre.setText(tarea.nombre)
+            tiempo.setText(tarea.tiempo)
+            dias.setText(tarea.dias.toString())
 
             return vista
         }
